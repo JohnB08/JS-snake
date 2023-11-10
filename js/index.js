@@ -40,7 +40,7 @@ function updateGridCoordinates() {
     let reverseStyleArray = gameElements.gridCoordinates.reverse();
     let tailArray = gameElements.tailElements;
     console.log(tailArray);
-    for (i = 0; i < reverseStyleArray.length; i++) {
+    for (i = 0; i < tailArray.length; i++) {
       tailArray[i].apple.element.style = reverseStyleArray[i + 1];
     }
   }
