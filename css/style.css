@@ -1,0 +1,24 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  display: grid;
+  place-content: center;
+}
+.gameScreen {
+  display: inherit;
+  gap: 2px;
+  border: 4px solid black;
+  grid-template-columns: repeat(50, 8px);
+  grid-template-rows: repeat(50, 8px);
+}
+
+.apple {
+  background-color: red;
+}
+.snakeHead,
+.snakeTail {
+  background-color: blue;
+}
