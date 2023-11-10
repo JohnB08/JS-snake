@@ -17,6 +17,7 @@ function makeElement(type, properties) {
 const gameElements = {};
 gameElements.tailElements = [];
 gameElements.appleElements = {};
+gameElements.gridCoordinates = [];
 gameScreen.appendChild(snakeHead);
 
 let moveUpInterval = null;
@@ -32,13 +33,17 @@ let prevX = 1;
 let prevY = 1;
 function updateGridCoordinates() {
   let gridStyle = `grid-column: ${startingPositionX}/span ${growthX}; grid-row: ${startingPositionY}/span ${growthY}`;
+  gameElements.gridCoordinates.push(gridStyle);
   snakeHead.style = gridStyle;
-  gameElements.tailElements.forEach((tail) => {
-    console.log(tail);
-    let x = tail.apple.appleX;
-    let y = tail.apple.appleY;
-    tail.apple.element.style = `grid-column: ${x}/span ${growthX}; grid-row: ${y}/span ${growthY}`;
-  });
+  if (gameElements.tailElements.length === 0) return;
+  else {
+    let reverseStyleArray = gameElements.gridCoordinates.reverse();
+    let tailArray = gameElements.tailElements;
+    console.log(tailArray);
+    for (i = 0; i < reverseStyleArray.length; i++) {
+      tailArray[i].apple.element.style = reverseStyleArray[i + 1];
+    }
+  }
 }
 
 function appleXCoordinates(prevX) {
@@ -52,8 +57,6 @@ function appleYCoordinates(prevY) {
   });
 }
 function moveRight() {
-  prevX = startingPositionX;
-  if (gameElements.tailElements.length !== 0) appleXCoordinates(prevX);
   eatApple();
 
   startingPositionX++;
@@ -72,8 +75,7 @@ function moveRight() {
 }
 
 function moveLeft() {
-  prevX = startingPositionX;
-  if (gameElements.tailElements.length !== 0) appleXCoordinates(prevX);
+  prevX = snakeHead.style;
   eatApple();
   startingPositionX--;
   if (
@@ -90,8 +92,7 @@ function moveLeft() {
   updateGridCoordinates();
 }
 function moveDown() {
-  prevY = startingPositionY;
-  if (gameElements.tailElements.length !== 0) appleYCoordinates(prevY);
+  prevY = snakeHead.style;
   eatApple();
 
   startingPositionY++;
@@ -109,8 +110,7 @@ function moveDown() {
   updateGridCoordinates();
 }
 function moveUp() {
-  prevY = startingPositionY;
-  if (gameElements.tailElements.length !== 0) appleYCoordinates(prevY);
+  prevY = snakeHead.style;
   eatApple();
 
   startingPositionY--;
