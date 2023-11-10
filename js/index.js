@@ -1,5 +1,8 @@
 const gameScreen = document.querySelector(".gameScreen");
+const scoreContainer = document.querySelector(".scoreContainer");
 const snakeHead = makeElement("div", { class: "snakeHead" });
+const scoreCount = makeElement("h2", { class: "score" });
+scoreCount.textContent = "score:";
 const gridSize = 50;
 function makeElement(type, properties) {
   const element = document.createElement(type);
@@ -18,6 +21,7 @@ const gameElements = {};
 gameElements.tailElements = [];
 gameElements.appleElements = {};
 gameElements.gridCoordinates = [];
+scoreContainer.appendChild(scoreCount);
 gameScreen.appendChild(snakeHead);
 
 let moveUpInterval = null;
@@ -26,35 +30,22 @@ let moveLeftInterval = null;
 let moveRightInterval = null;
 let startingPositionX = 1;
 let startingPositionY = 1;
-let growthX = 1;
-let growthY = 1;
-let totalGrowth = 1;
-let prevX = 1;
-let prevY = 1;
+let totalGrowth = 0;
 function updateGridCoordinates() {
-  let gridStyle = `grid-column: ${startingPositionX}/span ${growthX}; grid-row: ${startingPositionY}/span ${growthY}`;
-  gameElements.gridCoordinates.push(gridStyle);
+  let gridStyle = `grid-column: ${startingPositionX}/span 1; grid-row: ${startingPositionY}/span 1`;
+  gameElements.gridCoordinates.unshift(gridStyle);
   snakeHead.style = gridStyle;
+  updateTailCoordinates();
+}
+function updateTailCoordinates() {
   if (gameElements.tailElements.length === 0) return;
   else {
-    let reverseStyleArray = gameElements.gridCoordinates.reverse();
+    let coordinatesArray = gameElements.gridCoordinates;
     let tailArray = gameElements.tailElements;
-    console.log(tailArray);
     for (i = 0; i < tailArray.length; i++) {
-      tailArray[i].apple.element.style = reverseStyleArray[i + 1];
+      tailArray[i].apple.element.style = coordinatesArray[i + 1];
     }
   }
-}
-
-function appleXCoordinates(prevX) {
-  gameElements.tailElements.forEach((tail) => {
-    tail.apple.appleX = prevX;
-  });
-}
-function appleYCoordinates(prevY) {
-  gameElements.tailElements.forEach((tail) => {
-    tail.apple.appleY = prevY;
-  });
 }
 function moveRight() {
   eatApple();
@@ -75,7 +66,6 @@ function moveRight() {
 }
 
 function moveLeft() {
-  prevX = snakeHead.style;
   eatApple();
   startingPositionX--;
   if (
@@ -92,9 +82,7 @@ function moveLeft() {
   updateGridCoordinates();
 }
 function moveDown() {
-  prevY = snakeHead.style;
   eatApple();
-
   startingPositionY++;
   if (
     startingPositionY > gridSize &&
@@ -110,9 +98,7 @@ function moveDown() {
   updateGridCoordinates();
 }
 function moveUp() {
-  prevY = snakeHead.style;
   eatApple();
-
   startingPositionY--;
   if (
     startingPositionY < 1 &&
@@ -151,16 +137,16 @@ spawnApple();
 document.addEventListener("keydown", (event) => {
   if (event.key === "ArrowRight") {
     clearIntervals();
-    moveRightInterval = setInterval(moveRight, 250);
+    moveRightInterval = setInterval(moveRight, 100);
   } else if (event.key === "ArrowLeft") {
     clearIntervals();
-    moveLeftInterval = setInterval(moveLeft, 250);
+    moveLeftInterval = setInterval(moveLeft, 100);
   } else if (event.key === "ArrowDown") {
     clearIntervals();
-    moveDownInterval = setInterval(moveDown, 250);
+    moveDownInterval = setInterval(moveDown, 100);
   } else if (event.key === "ArrowUp") {
     clearIntervals();
-    moveUpInterval = setInterval(moveUp, 250);
+    moveUpInterval = setInterval(moveUp, 100);
   }
 });
 function eatApple() {
@@ -174,8 +160,8 @@ function eatApple() {
     else if (startingPositionY === appleY && startingPositionX === appleX) {
       spawnApple();
       convertApple(currentApple, appleY, appleX);
-
       totalGrowth++;
+      scoreCount.textContent = `score: ${totalGrowth}`;
     }
   });
 }
