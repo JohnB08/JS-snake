@@ -28,7 +28,6 @@ let gameScreenStyleArray =
 let gridSize = parseInt(
   gameScreenStyleArray[1].replace(/\D/g, "").split("").splice(0, 2, "").join("")
 );
-mobileSetup();
 console.log(gridSize);
 let gameReset = false;
 let moveUpInterval = null;
@@ -38,11 +37,12 @@ let moveRightInterval = null;
 let currentPositionX = 1;
 let currentPositionY = 1;
 let score = 0;
+let mobileMode = false;
 scoreCount.textContent = `score: ${score}`;
 let highScore = JSON.parse(localStorage.getItem("highScoreSnake")) || 0;
 highScoreCount.textContent = `high score: ${highScore}`;
+mobileSetup();
 showBtn();
-
 //spawner et eple i starten av spillet.
 spawnApple();
 
@@ -110,7 +110,11 @@ function GameOver() {
     else if (tail.apple.appleY !== currentPositionY) return;
     else {
       clearIntervals();
-      document.removeEventListener("keydown", gameControl);
+      if (!mobileMode) {
+        document.removeEventListener("keydown", gameControl);
+      } else {
+        removeMobileEventListeners();
+      }
       gameReset = true;
       snakeHead.classList.remove("rotateUp", "rotateDown", "rotateLeft");
       resetGameScreen();
@@ -317,9 +321,11 @@ function showBtn() {
 function btnRemoval() {
   gameElements.startBtn.remove();
   gameElements.startBtn = null;
-  document.addEventListener("keydown", (event) =>
-    gameControl(event.key.toLowerCase())
-  );
+  if (!mobileMode)
+    document.addEventListener("keydown", (event) =>
+      gameControl(event.key.toLowerCase())
+    );
+  else addMobileEventListeners();
 }
 
 //eventlistener for å starte spillet med "enter" knapp.
@@ -343,6 +349,7 @@ function mobileSetup() {
         .splice(0, 2, "")
         .join("")
     );
+    mobileMode = true;
     makeMobileButtons();
   }
 }
@@ -352,21 +359,47 @@ function makeMobileButtons() {
   });
   const mobileLeftButton = makeElement("button", { class: "mobileLeftButton" });
   mobileLeftButton.textContent = "LEFT!";
-  mobileLeftButton.addEventListener("click", () => gameControl("a"));
+  gameElements.mobileLeftButton = mobileLeftButton;
   const mobileRightButton = makeElement("button", {
     class: "mobileRightButton",
   });
   mobileRightButton.textContent = "RIGHT!";
-  mobileRightButton.addEventListener("click", () => gameControl("d"));
+  gameElements.mobileRightButton = mobileRightButton;
   const mobileUpButton = makeElement("button", { class: "mobileUpButton" });
   mobileUpButton.textContent = "UP!";
-  mobileUpButton.addEventListener("click", () => gameControl("w"));
+  gameElements.mobileUpButton = mobileUpButton;
   const mobileDownButton = makeElement("button", { class: "mobileDownButton" });
   mobileDownButton.textContent = "DOWN!";
-  mobileDownButton.addEventListener("click", () => gameControl("s"));
+  gameElements.mobileDownButton = mobileDownButton;
   document.body.appendChild(mobileControlContainer);
   mobileControlContainer.appendChild(mobileLeftButton);
   mobileControlContainer.appendChild(mobileRightButton);
   mobileControlContainer.appendChild(mobileUpButton);
   mobileControlContainer.appendChild(mobileDownButton);
+}
+function addMobileEventListeners() {
+  gameElements.mobileDownButton.addEventListener("click", () =>
+    gameControl("s")
+  );
+  gameElements.mobileUpButton.addEventListener("click", () => gameControl("w"));
+  gameElements.mobileRightButton.addEventListener("click", () =>
+    gameControl("d")
+  );
+  gameElements.mobileLeftButton.addEventListener("click", () =>
+    gameControl("a")
+  );
+}
+function removeMobileEventListeners() {
+  gameElements.mobileDownButton.removeEventListener("click", () =>
+    gameControl("s")
+  );
+  gameElements.mobileUpButton.removeEventListener("click", () =>
+    gameControl("w")
+  );
+  gameElements.mobileRightButton.removeEventListener("click", () =>
+    gameControl("d")
+  );
+  gameElements.mobileLeftButton.removeEventListener("click", () =>
+    gameControl("a")
+  );
 }
