@@ -6,6 +6,7 @@
 body {
   display: grid;
   place-content: center;
+  gap: 5px;
 }
 .gameScreen {
   display: inherit;
@@ -33,6 +34,10 @@ body {
 .btn:hover {
   background-color: bisque;
   color: black;
+}
+.scoreContainer {
+  display: flex;
+  justify-content: space-between;
 }
 h1,
 h3 {

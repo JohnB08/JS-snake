@@ -2,6 +2,7 @@ const gameScreen = document.querySelector(".gameScreen");
 const scoreContainer = document.querySelector(".scoreContainer");
 const snakeHead = makeElement("div", { class: "snakeHead" });
 const scoreCount = makeElement("h2", { class: "score" });
+const highScoreCount = makeElement("h2", { class: "highScore" });
 const gridSize = 50;
 function makeElement(type, properties) {
   const element = document.createElement(type);
@@ -16,7 +17,9 @@ function makeElement(type, properties) {
   });
   return element;
 }
+
 scoreContainer.appendChild(scoreCount);
+scoreContainer.appendChild(highScoreCount);
 gameScreen.appendChild(snakeHead);
 const gameElements = {
   tailElements: [],
@@ -33,6 +36,8 @@ let startingPositionX = 1;
 let startingPositionY = 1;
 let score = 0;
 scoreCount.textContent = `score: ${score}`;
+let highScore = JSON.parse(localStorage.getItem("highScoreSnake")) || 0;
+highScoreCount.textContent = `high score: ${highScore}`;
 startGame();
 function updateGridCoordinates() {
   let gridStyle = `grid-column: ${startingPositionX}/span 1; grid-row: ${startingPositionY}/span 1`;
@@ -84,6 +89,8 @@ function resetGameScreen() {
   startingPositionY = 1;
   let score = 0;
   scoreCount.textContent = `score: ${score}`;
+  startGame();
+  setHighScore();
   updateGridCoordinates();
 }
 function moveRight() {
@@ -103,7 +110,6 @@ function moveRight() {
   }
   updateGridCoordinates();
 }
-
 function moveLeft() {
   eatApple();
   startingPositionX--;
@@ -210,6 +216,14 @@ function convertApple(apple, y, x) {
   gameElements.tailElements.push({
     apple: { element: apple, appleX: x, appleY: y },
   });
+}
+function setHighScore() {
+  if (score < highScore) return;
+  else {
+    localStorage.setItem("highScoreSnake", `${score}`);
+    highScore = score;
+    highScoreCount.textContent = `high score: ${highScore}`;
+  }
 }
 function startGame() {
   let startBtn = makeElement("button", {
