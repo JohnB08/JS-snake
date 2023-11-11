@@ -17,23 +17,30 @@ function makeElement(type, properties) {
   });
   return element;
 }
-const gameElements = {};
-gameElements.tailElements = [];
-gameElements.appleElements = {};
-gameElements.gridCoordinates = [];
 scoreContainer.appendChild(scoreCount);
 gameScreen.appendChild(snakeHead);
-
+const gameElements = {
+  tailElements: [],
+  appleElements: {},
+  gridCoordinates: [],
+};
+let gameReset = false;
 let moveUpInterval = null;
 let moveDownInterval = null;
 let moveLeftInterval = null;
 let moveRightInterval = null;
 let startingPositionX = 1;
 let startingPositionY = 1;
-let totalGrowth = 0;
+let score = 0;
+startGame();
 function updateGridCoordinates() {
   let gridStyle = `grid-column: ${startingPositionX}/span 1; grid-row: ${startingPositionY}/span 1`;
   gameElements.gridCoordinates.unshift(gridStyle);
+  if (
+    gameElements.gridCoordinates.length >
+    gameElements.tailElements.length + 2
+  )
+    gameElements.gridCoordinates.pop();
   snakeHead.style = gridStyle;
   updateTailCoordinates();
 }
@@ -44,8 +51,37 @@ function updateTailCoordinates() {
     let tailArray = gameElements.tailElements;
     for (i = 0; i < tailArray.length; i++) {
       tailArray[i].apple.element.style = coordinatesArray[i + 1];
+      tailArray[i].apple.appleX = parseInt(
+        tailArray[i].apple.element.style.gridColumnStart
+      );
+      tailArray[i].apple.appleY = parseInt(
+        tailArray[i].apple.element.style.gridRowStart
+      );
     }
+    GameOver();
   }
+}
+function GameOver() {
+  let tailArray = gameElements.tailElements;
+  tailArray.forEach((tail) => {
+    if (tail.apple.appleX !== startingPositionX) return;
+    else if (tail.apple.appleY !== startingPositionY) return;
+    else {
+      clearIntervals();
+      document.removeEventListener("keydown", gameControl);
+      gameReset = true;
+      resetGameScreen();
+      startGame();
+    }
+  });
+}
+function resetGameScreen() {
+  let tailArray = document.querySelectorAll(".snakeTail");
+  tailArray.forEach((tail) => tail.remove());
+  gameElements.tailElements = [];
+  startingPositionX = 1;
+  startingPositionY = 1;
+  updateGridCoordinates();
 }
 function moveRight() {
   eatApple();
@@ -133,8 +169,8 @@ function spawnApple() {
   gameScreen.appendChild(apple);
 }
 spawnApple();
-/* let appleSpawner = setInterval(spawnApple, 1000); */
-document.addEventListener("keydown", (event) => {
+
+function gameControl(event) {
   if (event.key === "ArrowRight") {
     clearIntervals();
     moveRightInterval = setInterval(moveRight, 100);
@@ -148,7 +184,8 @@ document.addEventListener("keydown", (event) => {
     clearIntervals();
     moveUpInterval = setInterval(moveUp, 100);
   }
-});
+}
+
 function eatApple() {
   let appleArray = Object.keys(gameElements.appleElements);
   appleArray.forEach((apple) => {
@@ -160,8 +197,8 @@ function eatApple() {
     else if (startingPositionY === appleY && startingPositionX === appleX) {
       spawnApple();
       convertApple(currentApple, appleY, appleX);
-      totalGrowth++;
-      scoreCount.textContent = `score: ${totalGrowth}`;
+      score++;
+      scoreCount.textContent = `score: ${score}`;
     }
   });
 }
@@ -172,4 +209,21 @@ function convertApple(apple, y, x) {
     apple: { element: apple, appleX: x, appleY: y },
   });
 }
-console.log(snakeHead.getBoundingClientRect());
+function startGame() {
+  let startBtn = makeElement("button", {
+    class: "btn",
+    style: `grid-row: ${Math.floor(gridSize / 6) * 2}/ span ${
+      Math.floor(gridSize / 6) * 2
+    }; grid-column: ${Math.floor(gridSize / 4)}/ span ${
+      Math.floor(gridSize / 4) * 2
+    }`,
+  });
+  startBtn.textContent = "Start Game!";
+  console.log(startBtn);
+  if (gameReset === true) startBtn.textContent = "Reset Game!";
+  gameScreen.appendChild(startBtn);
+  startBtn.addEventListener("click", () => {
+    startBtn.remove();
+    document.addEventListener("keydown", gameControl);
+  });
+}
