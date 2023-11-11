@@ -12,16 +12,84 @@ body {
   display: inherit;
   gap: 1px;
   border: 4px solid black;
-  grid-template-columns: repeat(50, 8px);
-  grid-template-rows: repeat(50, 8px);
+  grid-template-columns: repeat(50, 10px);
+  grid-template-rows: repeat(50, 10px);
 }
 
 .apple {
   background-color: red;
+  position: relative;
+  border-radius: 30%;
+}
+.apple::before {
+  position: absolute;
+  height: 6px;
+  width: 2px;
+  background-color: rgb(64, 27, 14);
+  content: "";
+  top: -6px;
+  right: 4px;
+}
+.apple::after {
+  position: absolute;
+  width: 6px;
+  height: 3px;
+  background-color: green;
+  content: "";
+  transform: rotate(-45deg);
+  top: -6px;
+  right: 0px;
 }
 .snakeHead,
 .snakeTail {
   background-color: blue;
+}
+.snakeHead {
+  position: relative;
+  border-radius: 2px;
+}
+.snakeHead::before {
+  width: 2px;
+  height: 3px;
+  content: "";
+  background-color: snow;
+  position: absolute;
+  top: 0;
+  right: 2px;
+}
+.snakeHead::after {
+  width: 8px;
+  height: 2px;
+  content: "";
+  background-color: red;
+  position: absolute;
+  top: 4px;
+  right: -8px;
+  animation: toungeMovement 3s linear infinite;
+}
+@keyframes toungeMovement {
+  50% {
+    right: 0px;
+    width: 0px;
+  }
+}
+.secondEye {
+  width: 2px;
+  height: 3px;
+  content: "";
+  background-color: snow;
+  position: absolute;
+  top: 7px;
+  right: 2px;
+}
+.rotateUp {
+  transform: rotate(270deg);
+}
+.rotateLeft {
+  transform: rotate(180deg);
+}
+.rotateDown {
+  transform: rotate(90deg);
 }
 .btn {
   background-color: black;

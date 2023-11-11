@@ -4,9 +4,10 @@ const scoreContainer = document.querySelector(".scoreContainer");
 
 //lager nye elementer.
 const snakeHead = makeElement("div", { class: "snakeHead" });
+const snakeEye = makeElement("div", { class: "secondEye" });
 const scoreCount = makeElement("h2", { class: "score" });
 const highScoreCount = makeElement("h2", { class: "highScore" });
-
+snakeHead.appendChild(snakeEye);
 scoreContainer.appendChild(scoreCount);
 scoreContainer.appendChild(highScoreCount);
 gameScreen.appendChild(snakeHead);
@@ -99,6 +100,7 @@ function GameOver() {
       clearIntervals();
       document.removeEventListener("keydown", gameControl);
       gameReset = true;
+      snakeHead.classList.remove("rotateUp", "rotateDown", "rotateLeft");
       resetGameScreen();
       showBtn();
     }
@@ -219,19 +221,25 @@ function spawnApple() {
 function gameControl(event) {
   if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
     if (moveLeftInterval || moveRightInterval) return;
+    snakeHead.classList.remove("rotateUp", "rotateDown");
     clearIntervals();
     moveRightInterval = setInterval(moveRight, 100);
   } else if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
     if (moveLeftInterval || moveRightInterval) return;
+    snakeHead.classList.remove("rotateUp", "rotateDown");
+    snakeHead.classList.add("rotateLeft");
     clearIntervals();
     moveLeftInterval = setInterval(moveLeft, 100);
   } else if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") {
     if (moveUpInterval || moveDownInterval) return;
-
+    snakeHead.classList.remove("rotateLeft", "rotateRight");
+    snakeHead.classList.add("rotateDown");
     clearIntervals();
     moveDownInterval = setInterval(moveDown, 100);
   } else if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") {
     if (moveUpInterval || moveDownInterval) return;
+    snakeHead.classList.remove("rotateLeft", "rotateRight");
+    snakeHead.classList.add("rotateUp");
     clearIntervals();
     moveUpInterval = setInterval(moveUp, 100);
   }
