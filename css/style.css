@@ -34,3 +34,6 @@ body {
   background-color: bisque;
   color: black;
 }
+h1 {
+  justify-self: center;
+}
