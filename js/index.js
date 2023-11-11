@@ -23,6 +23,7 @@ const gameElements = {
   tailElements: [],
   appleElements: {},
   gridCoordinates: [],
+  startBtn: null,
 };
 let gameReset = false;
 let moveUpInterval = null;
@@ -215,15 +216,26 @@ function startGame() {
     style: `grid-row: ${Math.floor(gridSize / 6) * 2}/ span ${
       Math.floor(gridSize / 6) * 2
     }; grid-column: ${Math.floor(gridSize / 4)}/ span ${
-      Math.floor(gridSize / 4) * 2
+      Math.floor(gridSize / 16) * 9
     }`,
   });
+  gameElements.startBtn = startBtn;
   startBtn.textContent = "Start Game!";
   console.log(startBtn);
   if (gameReset === true) startBtn.textContent = "Reset Game!";
   gameScreen.appendChild(startBtn);
   startBtn.addEventListener("click", () => {
-    startBtn.remove();
-    document.addEventListener("keydown", gameControl);
+    btnRemoval();
   });
 }
+function btnRemoval() {
+  gameElements.startBtn.remove();
+  gameElements.startBtn = null;
+  document.addEventListener("keydown", gameControl);
+}
+document.addEventListener("keydown", (event) => {
+  if (!gameElements.startBtn) return;
+  if (event.code !== "Enter") return;
+  btnRemoval();
+  document.addEventListener("keydown", gameControl);
+});

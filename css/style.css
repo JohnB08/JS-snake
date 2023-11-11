@@ -22,3 +22,15 @@ body {
 .snakeTail {
   background-color: blue;
 }
+.btn {
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 28px;
+  z-index: 2;
+}
+.btn:hover {
+  background-color: bisque;
+  color: black;
+}
