@@ -11,13 +11,25 @@ snakeHead.appendChild(snakeEye);
 scoreContainer.appendChild(scoreCount);
 scoreContainer.appendChild(highScoreCount);
 gameScreen.appendChild(snakeHead);
-const gridSize = 50;
+console.log(document);
 const gameElements = {
   tailElements: [],
   appleElements: {},
   gridCoordinates: [],
   startBtn: null,
+  gameScreen: gameScreen,
 };
+
+//finner css rules for gameScreen
+let gameScreenStyleArray =
+  document.styleSheets[0].cssRules[2].cssText.split("repeat");
+
+//bruker parseInt + regex /\D/g for å fjerne alle bokstaver fra css rule etter repeat for å finne gridsize
+let gridSize = parseInt(
+  gameScreenStyleArray[1].replace(/\D/g, "").split("").splice(0, 2, "").join("")
+);
+mobileSetup();
+console.log(gridSize);
 let gameReset = false;
 let moveUpInterval = null;
 let moveDownInterval = null;
@@ -219,24 +231,24 @@ function spawnApple() {
 
 //funksjon som handler controls. skjekker hvilke taster som er trykket.
 function gameControl(event) {
-  if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
+  if (event === "arrowright" || event === "d") {
     if (moveLeftInterval || moveRightInterval) return;
     snakeHead.classList.remove("rotateUp", "rotateDown");
     clearIntervals();
     moveRightInterval = setInterval(moveRight, 100);
-  } else if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
+  } else if (event === "arrowleft" || event === "a") {
     if (moveLeftInterval || moveRightInterval) return;
     snakeHead.classList.remove("rotateUp", "rotateDown");
     snakeHead.classList.add("rotateLeft");
     clearIntervals();
     moveLeftInterval = setInterval(moveLeft, 100);
-  } else if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") {
+  } else if (event === "arrowdown" || event === "s") {
     if (moveUpInterval || moveDownInterval) return;
     snakeHead.classList.remove("rotateLeft", "rotateRight");
     snakeHead.classList.add("rotateDown");
     clearIntervals();
     moveDownInterval = setInterval(moveDown, 100);
-  } else if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") {
+  } else if (event === "arrowup" || event === "w") {
     if (moveUpInterval || moveDownInterval) return;
     snakeHead.classList.remove("rotateLeft", "rotateRight");
     snakeHead.classList.add("rotateUp");
@@ -305,7 +317,9 @@ function showBtn() {
 function btnRemoval() {
   gameElements.startBtn.remove();
   gameElements.startBtn = null;
-  document.addEventListener("keydown", gameControl);
+  document.addEventListener("keydown", (event) =>
+    gameControl(event.key.toLowerCase())
+  );
 }
 
 //eventlistener for å starte spillet med "enter" knapp.
@@ -315,3 +329,44 @@ document.addEventListener("keydown", (event) => {
   btnRemoval();
   document.addEventListener("keydown", gameControl);
 });
+function mobileSetup() {
+  if (window.innerWidth > 600) return;
+  else {
+    //finner gridSize på samme måte som i sted.
+    gameScreenStyleArray =
+      document.styleSheets[0].cssRules[19].cssText.split("repeat");
+    console.log(gameScreenStyleArray);
+    gridSize = parseInt(
+      gameScreenStyleArray[1]
+        .replace(/\D/g, "")
+        .split("")
+        .splice(0, 2, "")
+        .join("")
+    );
+    makeMobileButtons();
+  }
+}
+function makeMobileButtons() {
+  const mobileControlContainer = makeElement("div", {
+    class: "mobileControlContainer",
+  });
+  const mobileLeftButton = makeElement("button", { class: "mobileLeftButton" });
+  mobileLeftButton.textContent = "LEFT!";
+  mobileLeftButton.addEventListener("click", () => gameControl("a"));
+  const mobileRightButton = makeElement("button", {
+    class: "mobileRightButton",
+  });
+  mobileRightButton.textContent = "RIGHT!";
+  mobileRightButton.addEventListener("click", () => gameControl("d"));
+  const mobileUpButton = makeElement("button", { class: "mobileUpButton" });
+  mobileUpButton.textContent = "UP!";
+  mobileUpButton.addEventListener("click", () => gameControl("w"));
+  const mobileDownButton = makeElement("button", { class: "mobileDownButton" });
+  mobileDownButton.textContent = "DOWN!";
+  mobileDownButton.addEventListener("click", () => gameControl("s"));
+  document.body.appendChild(mobileControlContainer);
+  mobileControlContainer.appendChild(mobileLeftButton);
+  mobileControlContainer.appendChild(mobileRightButton);
+  mobileControlContainer.appendChild(mobileUpButton);
+  mobileControlContainer.appendChild(mobileDownButton);
+}
