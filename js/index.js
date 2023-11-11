@@ -1,9 +1,39 @@
+//henter inn det som trengs fra HTML
 const gameScreen = document.querySelector(".gameScreen");
 const scoreContainer = document.querySelector(".scoreContainer");
+
+//lager nye elementer.
 const snakeHead = makeElement("div", { class: "snakeHead" });
 const scoreCount = makeElement("h2", { class: "score" });
 const highScoreCount = makeElement("h2", { class: "highScore" });
+
+scoreContainer.appendChild(scoreCount);
+scoreContainer.appendChild(highScoreCount);
+gameScreen.appendChild(snakeHead);
 const gridSize = 50;
+const gameElements = {
+  tailElements: [],
+  appleElements: {},
+  gridCoordinates: [],
+  startBtn: null,
+};
+let gameReset = false;
+let moveUpInterval = null;
+let moveDownInterval = null;
+let moveLeftInterval = null;
+let moveRightInterval = null;
+let currentPositionX = 1;
+let currentPositionY = 1;
+let score = 0;
+scoreCount.textContent = `score: ${score}`;
+let highScore = JSON.parse(localStorage.getItem("highScoreSnake")) || 0;
+highScoreCount.textContent = `high score: ${highScore}`;
+showBtn();
+
+//spawner et eple i starten av spillet.
+spawnApple();
+
+//funksjon som lager HTML elementer.
 function makeElement(type, properties) {
   const element = document.createElement(type);
   //tar alle keys og values og gjør de om til key/value arrays.
@@ -18,31 +48,11 @@ function makeElement(type, properties) {
   return element;
 }
 
-scoreContainer.appendChild(scoreCount);
-scoreContainer.appendChild(highScoreCount);
-gameScreen.appendChild(snakeHead);
-const gameElements = {
-  tailElements: [],
-  appleElements: {},
-  gridCoordinates: [],
-  startBtn: null,
-};
-let gameReset = false;
-let moveUpInterval = null;
-let moveDownInterval = null;
-let moveLeftInterval = null;
-let moveRightInterval = null;
-let startingPositionX = 1;
-let startingPositionY = 1;
-let score = 0;
-scoreCount.textContent = `score: ${score}`;
-let highScore = JSON.parse(localStorage.getItem("highScoreSnake")) || 0;
-highScoreCount.textContent = `high score: ${highScore}`;
-startGame();
-
 //Funksjon som oppdaterer grid koordinatene til "snake" og "tail" etterhvert som den flytter seg.
+//skjekker også om det er et eple på current coordinates.
 function updateGridCoordinates() {
-  let gridStyle = `grid-column: ${startingPositionX}/span 1; grid-row: ${startingPositionY}/span 1`;
+  eatApple();
+  let gridStyle = `grid-column: ${currentPositionX}/span 1; grid-row: ${currentPositionY}/span 1`;
   gameElements.gridCoordinates.unshift(gridStyle);
   if (
     gameElements.gridCoordinates.length >
@@ -64,6 +74,9 @@ function updateTailCoordinates() {
 function saveTailCoordinates() {
   let coordinatesArray = gameElements.gridCoordinates;
   let tailArray = gameElements.tailElements;
+  //setter koordinatene for hver "tail"
+  //bruker parseInt global funksjon, siden de fleste style values er strings.
+  //parseInt() gjør det om til et nummer hvis det kan.
   for (i = 0; i < tailArray.length; i++) {
     tailArray[i].apple.element.style = coordinatesArray[i + 1];
     tailArray[i].apple.appleX = parseInt(
@@ -76,17 +89,18 @@ function saveTailCoordinates() {
 }
 
 //funksjon som skjekker om "snakeHead" og "snakeTail" har samme posisjon i grid.
+//hvis det stemmer, reset spillet.
 function GameOver() {
   let tailArray = gameElements.tailElements;
   tailArray.forEach((tail) => {
-    if (tail.apple.appleX !== startingPositionX) return;
-    else if (tail.apple.appleY !== startingPositionY) return;
+    if (tail.apple.appleX !== currentPositionX) return;
+    else if (tail.apple.appleY !== currentPositionY) return;
     else {
       clearIntervals();
       document.removeEventListener("keydown", gameControl);
       gameReset = true;
       resetGameScreen();
-      startGame();
+      showBtn();
     }
   });
 }
@@ -98,88 +112,96 @@ function resetGameScreen() {
   let tailArray = document.querySelectorAll(".snakeTail");
   tailArray.forEach((tail) => tail.remove());
   gameElements.tailElements = [];
-  startingPositionX = 1;
-  startingPositionY = 1;
+  currentPositionX = 1;
+  currentPositionY = 1;
   setHighScore();
   let score = 0;
   scoreCount.textContent = `score: ${score}`;
   updateGridCoordinates();
 }
+
+//Funksjon som øker / flytter på grid posisjon mot høyre.
 function moveRight() {
-  eatApple();
-
-  startingPositionX++;
+  currentPositionX++;
   if (
-    startingPositionX > gridSize &&
-    startingPositionY < gridSize &&
-    startingPositionY >= 1
+    currentPositionX > gridSize &&
+    currentPositionY < gridSize &&
+    currentPositionY >= 1
   ) {
-    startingPositionY++;
-    startingPositionX = 1;
-  } else if (startingPositionX > gridSize && startingPositionY === gridSize) {
-    startingPositionX = 1;
-    startingPositionY = 1;
+    currentPositionY++;
+    currentPositionX = 1;
+  } else if (currentPositionX > gridSize && currentPositionY === gridSize) {
+    currentPositionX = 1;
+    currentPositionY = 1;
   }
   updateGridCoordinates();
 }
+
+//Funksjon som øker / flytter på grid posisjon mot venstre.
 function moveLeft() {
-  eatApple();
-  startingPositionX--;
+  currentPositionX--;
   if (
-    startingPositionX < 1 &&
-    startingPositionY <= gridSize &&
-    startingPositionY > 1
+    currentPositionX < 1 &&
+    currentPositionY <= gridSize &&
+    currentPositionY > 1
   ) {
-    startingPositionY--;
-    startingPositionX = gridSize;
-  } else if (startingPositionX <= 1 && startingPositionY === 1) {
-    startingPositionX = gridSize;
-    startingPositionY = gridSize;
-  }
-  updateGridCoordinates();
-}
-function moveDown() {
-  eatApple();
-  startingPositionY++;
-  if (
-    startingPositionY > gridSize &&
-    startingPositionX < gridSize &&
-    startingPositionX >= 1
-  ) {
-    startingPositionX++;
-    startingPositionY = 1;
-  } else if (startingPositionY > gridSize && startingPositionX === gridSize) {
-    startingPositionX = 1;
-    startingPositionY = 1;
-  }
-  updateGridCoordinates();
-}
-function moveUp() {
-  eatApple();
-  startingPositionY--;
-  if (
-    startingPositionY < 1 &&
-    startingPositionX <= gridSize &&
-    startingPositionX > 1
-  ) {
-    startingPositionX--;
-    startingPositionY = gridSize;
-  } else if (startingPositionY <= 1 && startingPositionX === 1) {
-    startingPositionX = gridSize;
-    startingPositionY = gridSize;
+    currentPositionY--;
+    currentPositionX = gridSize;
+  } else if (currentPositionX <= 1 && currentPositionY === 1) {
+    currentPositionX = gridSize;
+    currentPositionY = gridSize;
   }
   updateGridCoordinates();
 }
 
+//Funksjon som øker / flytter på grid posisjon nedover.
+function moveDown() {
+  currentPositionY++;
+  if (
+    currentPositionY > gridSize &&
+    currentPositionX < gridSize &&
+    currentPositionX >= 1
+  ) {
+    currentPositionX++;
+    currentPositionY = 1;
+  } else if (currentPositionY > gridSize && currentPositionX === gridSize) {
+    currentPositionX = 1;
+    currentPositionY = 1;
+  }
+  updateGridCoordinates();
+}
+
+//Funksjon som øker / flytter på grid posisjon oppover.
+function moveUp() {
+  currentPositionY--;
+  if (
+    currentPositionY < 1 &&
+    currentPositionX <= gridSize &&
+    currentPositionX > 1
+  ) {
+    currentPositionX--;
+    currentPositionY = gridSize;
+  } else if (currentPositionY <= 1 && currentPositionX === 1) {
+    currentPositionX = gridSize;
+    currentPositionY = gridSize;
+  }
+  updateGridCoordinates();
+}
+
+//funksjon som clearer alle intervals, sånn at de kan resettes.
 function clearIntervals() {
   clearInterval(moveUpInterval);
   clearInterval(moveDownInterval);
   clearInterval(moveLeftInterval);
   clearInterval(moveRightInterval);
 }
+
+//funksjon som lager en random grid posisjon.
 function randomGridPosition() {
   return Math.ceil(Math.random() * gridSize);
 }
+
+//funksjon som spawner et eple, og gir den en random grid posisjon.
 function spawnApple() {
   let apple = makeElement("div", { class: "apple" });
   let appleX = randomGridPosition();
@@ -188,8 +210,8 @@ function spawnApple() {
   apple.style = `grid-column: ${appleX}/span 1; grid-row: ${appleY}/span 1`;
   gameScreen.appendChild(apple);
 }
-spawnApple();
 
+//funksjon som handler controls. skjekker hvilke taster som er trykket.
 function gameControl(event) {
   if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
     clearIntervals();
@@ -206,15 +228,16 @@ function gameControl(event) {
   }
 }
 
+//funksjon som skjekker om et "eple" er spist.
 function eatApple() {
   let appleArray = Object.keys(gameElements.appleElements);
   appleArray.forEach((apple) => {
     let currentApple = gameElements.appleElements[apple].element;
     let appleY = gameElements.appleElements[apple].y;
     let appleX = gameElements.appleElements[apple].x;
-    if (startingPositionX !== appleX) return;
-    else if (startingPositionY !== appleY) return;
-    else if (startingPositionY === appleY && startingPositionX === appleX) {
+    if (currentPositionX !== appleX) return;
+    else if (currentPositionY !== appleY) return;
+    else if (currentPositionY === appleY && currentPositionX === appleX) {
       spawnApple();
       convertApple(currentApple, appleY, appleX);
       score++;
@@ -222,6 +245,8 @@ function eatApple() {
     }
   });
 }
+
+//funksjon som konverterer eple til et haleelement hvis det er spist i eatApple()
 function convertApple(apple, y, x) {
   apple.classList.remove("apple");
   apple.classList.add("snakeTail");
@@ -229,6 +254,8 @@ function convertApple(apple, y, x) {
     apple: { element: apple, appleX: x, appleY: y },
   });
 }
+
+//skjekker om det er en ny highscore. poster highscore i localStorage.
 function setHighScore() {
   if (score < highScore) return;
   else {
@@ -237,7 +264,9 @@ function setHighScore() {
     highScoreCount.textContent = `high score: ${highScore}`;
   }
 }
-function startGame() {
+
+//funksjon som lager knappen som starter spillet på gamestart eller hvis spillet resetes.
+function showBtn() {
   let startBtn = makeElement("button", {
     class: "btn",
     style: `grid-row: ${Math.floor(gridSize / 6) * 2}/ span ${
@@ -254,11 +283,15 @@ function startGame() {
     btnRemoval();
   });
 }
+
+//funksjon som fjerner knappen på gamestart, og lager eventlistener til gameControl.
 function btnRemoval() {
   gameElements.startBtn.remove();
   gameElements.startBtn = null;
   document.addEventListener("keydown", gameControl);
 }
+
+//eventlistener for å starte spillet med "enter" knapp.
 document.addEventListener("keydown", (event) => {
   if (!gameElements.startBtn) return;
   if (event.code !== "Enter") return;
