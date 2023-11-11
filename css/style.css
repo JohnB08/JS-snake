@@ -34,6 +34,7 @@ body {
   background-color: bisque;
   color: black;
 }
-h1 {
+h1,
+h3 {
   justify-self: center;
 }
