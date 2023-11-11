@@ -39,6 +39,8 @@ scoreCount.textContent = `score: ${score}`;
 let highScore = JSON.parse(localStorage.getItem("highScoreSnake")) || 0;
 highScoreCount.textContent = `high score: ${highScore}`;
 startGame();
+
+//Funksjon som oppdaterer grid koordinatene til "snake" og "tail" etterhvert som den flytter seg.
 function updateGridCoordinates() {
   let gridStyle = `grid-column: ${startingPositionX}/span 1; grid-row: ${startingPositionY}/span 1`;
   gameElements.gridCoordinates.unshift(gridStyle);
@@ -50,23 +52,30 @@ function updateGridCoordinates() {
   snakeHead.style = gridStyle;
   updateTailCoordinates();
 }
+
+//funksjonen som opptarerer tail coordinates. Skjekker også om "snakeHead" er borti "snakeTail"
 function updateTailCoordinates() {
   if (gameElements.tailElements.length === 0) return;
-  else {
-    let coordinatesArray = gameElements.gridCoordinates;
-    let tailArray = gameElements.tailElements;
-    for (i = 0; i < tailArray.length; i++) {
-      tailArray[i].apple.element.style = coordinatesArray[i + 1];
-      tailArray[i].apple.appleX = parseInt(
-        tailArray[i].apple.element.style.gridColumnStart
-      );
-      tailArray[i].apple.appleY = parseInt(
-        tailArray[i].apple.element.style.gridRowStart
-      );
-    }
-    GameOver();
+  else saveTailCoordinates();
+  GameOver();
+}
+
+//funksjon som lagrer X og Y koordinatene til hver "tail" i grid.
+function saveTailCoordinates() {
+  let coordinatesArray = gameElements.gridCoordinates;
+  let tailArray = gameElements.tailElements;
+  for (i = 0; i < tailArray.length; i++) {
+    tailArray[i].apple.element.style = coordinatesArray[i + 1];
+    tailArray[i].apple.appleX = parseInt(
+      tailArray[i].apple.element.style.gridColumnStart
+    );
+    tailArray[i].apple.appleY = parseInt(
+      tailArray[i].apple.element.style.gridRowStart
+    );
   }
 }
+
+//funksjon som skjekker om "snakeHead" og "snakeTail" har samme posisjon i grid.
 function GameOver() {
   let tailArray = gameElements.tailElements;
   tailArray.forEach((tail) => {
@@ -81,16 +90,19 @@ function GameOver() {
     }
   });
 }
+
+//funksjon som resetter gameScreen.
+//plaserer "snakeHead" tilbake til start i toppen. fjerner alle haler.
+//skjekker highscore, resetter score.
 function resetGameScreen() {
   let tailArray = document.querySelectorAll(".snakeTail");
   tailArray.forEach((tail) => tail.remove());
   gameElements.tailElements = [];
   startingPositionX = 1;
   startingPositionY = 1;
+  setHighScore();
   let score = 0;
   scoreCount.textContent = `score: ${score}`;
-  startGame();
-  setHighScore();
   updateGridCoordinates();
 }
 function moveRight() {
