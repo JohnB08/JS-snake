@@ -191,9 +191,13 @@ function moveUp() {
 //funksjon som clearer alle intervals, sånn at de kan resettes.
 function clearIntervals() {
   clearInterval(moveUpInterval);
+  moveUpInterval = null;
   clearInterval(moveDownInterval);
+  moveDownInterval = null;
   clearInterval(moveLeftInterval);
+  moveLeftInterval = null;
   clearInterval(moveRightInterval);
+  moveRightInterval = null;
 }
 
 //funksjon som lager en random grid posisjon.
@@ -214,15 +218,20 @@ function spawnApple() {
 //funksjon som handler controls. skjekker hvilke taster som er trykket.
 function gameControl(event) {
   if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
+    if (moveLeftInterval || moveRightInterval) return;
     clearIntervals();
     moveRightInterval = setInterval(moveRight, 100);
   } else if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
+    if (moveLeftInterval || moveRightInterval) return;
     clearIntervals();
     moveLeftInterval = setInterval(moveLeft, 100);
   } else if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") {
+    if (moveUpInterval || moveDownInterval) return;
+
     clearIntervals();
     moveDownInterval = setInterval(moveDown, 100);
   } else if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") {
+    if (moveUpInterval || moveDownInterval) return;
     clearIntervals();
     moveUpInterval = setInterval(moveUp, 100);
   }
