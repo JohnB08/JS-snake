@@ -167,7 +167,6 @@ function spawnApple() {
   let appleX = randomGridPosition();
   let appleY = randomGridPosition();
   gameElements.appleElements.apple = { element: apple, x: appleX, y: appleY };
-  console.log(gameElements.appleElements.apple);
   apple.style = `grid-column: ${appleX}/span 1; grid-row: ${appleY}/span 1`;
   gameScreen.appendChild(apple);
 }
@@ -223,7 +222,6 @@ function startGame() {
   });
   gameElements.startBtn = startBtn;
   startBtn.textContent = "Start Game!";
-  console.log(startBtn);
   if (gameReset === true) startBtn.textContent = "Reset Game!";
   gameScreen.appendChild(startBtn);
   startBtn.addEventListener("click", () => {
