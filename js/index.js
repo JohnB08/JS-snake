@@ -18,6 +18,7 @@ const gameElements = {
   gridCoordinates: [],
   startBtn: null,
   gameScreen: gameScreen,
+  testArray: [],
 };
 
 //finner css rules for gameScreen
@@ -37,6 +38,7 @@ let moveRightInterval = null;
 let currentPositionX = 1;
 let currentPositionY = 1;
 let score = 0;
+let gameActive = false;
 let mobileMode = false;
 scoreCount.textContent = `score: ${score}`;
 let highScore = JSON.parse(localStorage.getItem("highScoreSnake")) || 0;
@@ -108,18 +110,11 @@ function GameOver() {
   tailArray.forEach((tail) => {
     if (tail.apple.appleX !== currentPositionX) return;
     else if (tail.apple.appleY !== currentPositionY) return;
-    else {
-      clearIntervals();
-      if (!mobileMode) {
-        document.removeEventListener("keydown", gameControl);
-      } else {
-        removeMobileEventListeners();
-      }
-      gameReset = true;
-      snakeHead.classList.remove("rotateUp", "rotateDown", "rotateLeft");
-      resetGameScreen();
-      showBtn();
-    }
+    clearIntervals();
+    gameReset = true;
+    gameActive = false;
+    resetGameScreen();
+    showBtn();
   });
 }
 
@@ -130,6 +125,7 @@ function resetGameScreen() {
   let tailArray = document.querySelectorAll(".snakeTail");
   tailArray.forEach((tail) => tail.remove());
   gameElements.tailElements = [];
+  snakeHead.classList.remove("rotateUp", "rotateDown", "rotateLeft");
   currentPositionX = 1;
   currentPositionY = 1;
   setHighScore();
@@ -321,11 +317,7 @@ function showBtn() {
 function btnRemoval() {
   gameElements.startBtn.remove();
   gameElements.startBtn = null;
-  if (!mobileMode)
-    document.addEventListener("keydown", (event) =>
-      gameControl(event.key.toLowerCase())
-    );
-  else addMobileEventListeners();
+  gameActive = true;
 }
 
 //eventlistener for å starte spillet med "enter" knapp.
@@ -333,7 +325,6 @@ document.addEventListener("keydown", (event) => {
   if (!gameElements.startBtn) return;
   if (event.code !== "Enter") return;
   btnRemoval();
-  document.addEventListener("keydown", gameControl);
 });
 function mobileSetup() {
   if (window.innerWidth > 600) return;
@@ -376,30 +367,28 @@ function makeMobileButtons() {
   mobileControlContainer.appendChild(mobileRightButton);
   mobileControlContainer.appendChild(mobileUpButton);
   mobileControlContainer.appendChild(mobileDownButton);
+  addMobileEventListeners();
 }
 function addMobileEventListeners() {
-  gameElements.mobileDownButton.addEventListener("click", () =>
-    gameControl("s")
-  );
-  gameElements.mobileUpButton.addEventListener("click", () => gameControl("w"));
-  gameElements.mobileRightButton.addEventListener("click", () =>
-    gameControl("d")
-  );
-  gameElements.mobileLeftButton.addEventListener("click", () =>
-    gameControl("a")
-  );
+  gameElements.mobileDownButton.addEventListener("click", () => {
+    if (!gameActive || !mobileMode) return;
+    gameControl("s");
+  });
+  gameElements.mobileUpButton.addEventListener("click", () => {
+    if (!gameActive || !mobileMode) return;
+    gameControl("w");
+  });
+  gameElements.mobileRightButton.addEventListener("click", () => {
+    if (!gameActive || !mobileMode) return;
+    gameControl("d");
+  });
+  gameElements.mobileLeftButton.addEventListener("click", () => {
+    if (!gameActive || !mobileMode) return;
+    gameControl("a");
+  });
 }
-function removeMobileEventListeners() {
-  gameElements.mobileDownButton.removeEventListener("click", () =>
-    gameControl("s")
-  );
-  gameElements.mobileUpButton.removeEventListener("click", () =>
-    gameControl("w")
-  );
-  gameElements.mobileRightButton.removeEventListener("click", () =>
-    gameControl("d")
-  );
-  gameElements.mobileLeftButton.removeEventListener("click", () =>
-    gameControl("a")
-  );
-}
+document.addEventListener("keydown", (event) => {
+  if (!gameActive || mobileMode) return;
+  gameControl(event.key.toLowerCase());
+  console.log(event.key.toLowerCase());
+});
