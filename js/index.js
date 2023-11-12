@@ -298,11 +298,6 @@ function setHighScore() {
 function showBtn() {
   let startBtn = makeElement("button", {
     class: "btn",
-    style: `grid-row: ${Math.floor(gridSize / 6) * 2}/ span ${
-      Math.floor(gridSize / 6) * 2
-    }; grid-column: ${Math.floor(gridSize / 4)}/ span ${
-      Math.floor(gridSize / 16) * 9
-    }`,
   });
   gameElements.startBtn = startBtn;
   startBtn.textContent = "Start Game!";
