@@ -339,6 +339,7 @@ function mobileSetup() {
     makeMobileButtons();
   }
 }
+//denne blir mye bedre når eg endrer makeElements.
 function makeMobileButtons() {
   const mobileControlContainer = makeElement("div", {
     class: "mobileControlContainer",
