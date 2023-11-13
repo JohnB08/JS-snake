@@ -116,19 +116,6 @@ h3 {
   justify-self: center;
 }
 
-@media only screen and (max-width: 600px) {
-  body {
-    font-size: 8px;
-  }
-  .gameScreen {
-    grid-template-columns: repeat(30, 10px);
-    grid-template-rows: repeat(30, 10px);
-  }
-  .btn {
-    font-size: 16px;
-  }
-}
-
 .mobileControlContainer {
   justify-self: center;
   display: grid;
@@ -162,4 +149,17 @@ h3 {
 }
 .d {
   grid-area: 2/3/3/4;
+}
+
+@media only screen and (max-width: 600px) {
+  body {
+    font-size: 8px;
+  }
+  .gameScreen {
+    grid-template-columns: repeat(30, 10px);
+    grid-template-rows: repeat(30, 10px);
+  }
+  .btn {
+    font-size: 16px;
+  }
 }

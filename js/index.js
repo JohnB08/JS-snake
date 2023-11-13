@@ -18,7 +18,7 @@ const gameElements = {
   gridCoordinates: [],
   startBtn: null,
   gameScreen: gameScreen,
-  testArray: [],
+  mobileScreenStyleArray: [],
 };
 const inputObject = {
   w: "UP!",
@@ -27,15 +27,43 @@ const inputObject = {
   d: "RIGHT!",
 };
 
-//finner css rules for gameScreen
-let gameScreenStyleArray =
-  document.styleSheets[0].cssRules[2].cssText.split("repeat");
+let gridSize = 0;
+let mobileGridSize = 0;
 
+//finner css rules for gameScreen
+let gameScreenStyleArray = Array.from(document.styleSheets[0].cssRules);
 //bruker parseInt + regex /\D/g for å fjerne alle bokstaver fra css rule etter repeat for å finne gridsize
-let gridSize = parseInt(
-  gameScreenStyleArray[1].replace(/\D/g, "").split("").splice(0, 2, "").join("")
-);
-console.log(gridSize);
+/* Det var ganske tricky å gjøre denne agnostic for hvor tallene stod i CSS sheet.
+Men nå kan nye ting bli adda i CSS uten å være redd for rekkefølgen. className må ikke endres på, da må det endres her. */
+gameScreenStyleArray.forEach((style) => {
+  if (style.selectorText === ".gameScreen")
+    gridSize = parseInt(
+      style.style.gridTemplateColumns
+        .replace(/\D/g, "")
+        .split("")
+        .splice(0, 2, "")
+        .join("")
+    );
+});
+//bruker samme for å finne gridsize på tlf.
+gameScreenStyleArray.forEach((style) => {
+  if (style.conditionText === "only screen and (max-width: 600px)") {
+    let mediaRules = Object.keys(style.cssRules);
+    let ruleObject = style.cssRules;
+    mediaRules.forEach((rule) => {
+      if (ruleObject[rule].selectorText === ".gameScreen") {
+        mobileGridSize = parseInt(
+          ruleObject[rule].style.gridTemplateColumns
+            .replace(/\D/g, "")
+            .split("")
+            .splice(0, 2, "")
+            .join("")
+        );
+      }
+    });
+  }
+});
+console.log(mobileGridSize);
 let gameReset = false;
 let moveUpInterval = null;
 let moveDownInterval = null;
@@ -49,6 +77,7 @@ let mobileMode = false;
 scoreCount.textContent = `score: ${score}`;
 let highScore = JSON.parse(localStorage.getItem("highScoreSnake")) || 0;
 highScoreCount.textContent = `high score: ${highScore}`;
+let moved = true;
 mobileSetup();
 showBtn();
 //spawner et eple i starten av spillet.
@@ -81,6 +110,7 @@ function updateGridCoordinates() {
     gameElements.gridCoordinates.pop();
   snakeHead.style = gridStyle;
   updateTailCoordinates();
+  moved = true;
 }
 
 //funksjonen som opptarerer tail coordinates. Skjekker også om "snakeHead" er borti "snakeTail"
@@ -217,6 +247,7 @@ function clearIntervals() {
   moveLeftInterval = null;
   clearInterval(moveRightInterval);
   moveRightInterval = null;
+  moved = false;
 }
 
 //funksjon som lager en random grid posisjon.
@@ -329,25 +360,18 @@ document.addEventListener("keydown", (event) => {
   if (event.code !== "Enter") return;
   btnRemoval();
 });
+
+//funksjon som skjekker om vi er på mobil
 function mobileSetup() {
   if (window.innerWidth > 600) return;
   else {
     //finner gridSize på samme måte som i sted.
-    gameScreenStyleArray =
-      document.styleSheets[0].cssRules[19].cssText.split("repeat");
-    console.log(gameScreenStyleArray);
-    gridSize = parseInt(
-      gameScreenStyleArray[1]
-        .replace(/\D/g, "")
-        .split("")
-        .splice(0, 2, "")
-        .join("")
-    );
+    gridSize = mobileGridSize;
     mobileMode = true;
     makeMobileButtons();
   }
 }
-//denne blir mye bedre når eg endrer makeElements.
+//funksjon som lager knapper hvis vi er på tlf.
 function makeMobileButtons() {
   const mobileControlContainer = makeElement("div", {
     className: "mobileControlContainer",
@@ -359,14 +383,16 @@ function makeMobileButtons() {
     });
     mobileControlContainer.appendChild(inputButton);
     inputButton.addEventListener("click", () => {
-      if (!gameActive || !mobileMode) return;
+      if (!gameActive || !mobileMode || !moved) return;
       gameControl(input);
     });
   });
   document.body.appendChild(mobileControlContainer);
 }
+
+//main event listener.
 document.addEventListener("keydown", (event) => {
-  if (!gameActive || mobileMode) return;
+  if (!gameActive || mobileMode || !moved) return;
   gameControl(event.key.toLowerCase());
   console.log(event.key.toLowerCase());
 });
