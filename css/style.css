@@ -12,8 +12,8 @@ body {
   display: inherit;
   gap: 1px;
   border: 4px solid black;
-  grid-template-columns: repeat(50, 10px);
-  grid-template-rows: repeat(50, 10px);
+  grid-template-columns: repeat(40, 12px);
+  grid-template-rows: repeat(40, 12px);
   position: relative;
 }
 
@@ -80,7 +80,7 @@ body {
   content: "";
   background-color: snow;
   position: absolute;
-  top: 7px;
+  bottom: 0;
   right: 2px;
 }
 .rotateUp {
