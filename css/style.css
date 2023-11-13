@@ -151,15 +151,15 @@ h3 {
   background-color: black;
   color: white;
 }
-.mobileLeftButton {
+.a {
   grid-area: 2/1/3/2;
 }
-.mobileDownButton {
+.s {
   grid-area: 2/2/3/3;
 }
-.mobileUpButton {
+.w {
   grid-area: 1/2/2/3;
 }
-.mobileRightButton {
+.d {
   grid-area: 2/3/3/4;
 }

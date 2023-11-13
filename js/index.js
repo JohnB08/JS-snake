@@ -3,10 +3,10 @@ const gameScreen = document.querySelector(".gameScreen");
 const scoreContainer = document.querySelector(".scoreContainer");
 
 //lager nye elementer.
-const snakeHead = makeElement("div", { class: "snakeHead" });
-const snakeEye = makeElement("div", { class: "secondEye" });
-const scoreCount = makeElement("h2", { class: "score" });
-const highScoreCount = makeElement("h2", { class: "highScore" });
+const snakeHead = makeElement("div", { className: "snakeHead" });
+const snakeEye = makeElement("div", { className: "secondEye" });
+const scoreCount = makeElement("h2", { className: "score" });
+const highScoreCount = makeElement("h2", { className: "highScore" });
 snakeHead.appendChild(snakeEye);
 scoreContainer.appendChild(scoreCount);
 scoreContainer.appendChild(highScoreCount);
@@ -19,6 +19,12 @@ const gameElements = {
   startBtn: null,
   gameScreen: gameScreen,
   testArray: [],
+};
+const inputObject = {
+  w: "UP!",
+  a: "LEFT!",
+  s: "DOWN!",
+  d: "RIGHT!",
 };
 
 //finner css rules for gameScreen
@@ -57,8 +63,7 @@ function makeElement(type, properties) {
     //dekonstrukter hvert key/value array til to variabler:
     const [propertyName, propertyValue] = property;
     //setter hver property til elementet:
-    //prøver å bruke .setAttribute for å unngå kluss med reserved words.
-    element.setAttribute(propertyName, propertyValue);
+    element[propertyName] = propertyValue;
   });
   return element;
 }
@@ -71,7 +76,7 @@ function updateGridCoordinates() {
   gameElements.gridCoordinates.unshift(gridStyle);
   if (
     gameElements.gridCoordinates.length >
-    gameElements.tailElements.length + 2
+    gameElements.tailElements.length + 1
   )
     gameElements.gridCoordinates.pop();
   snakeHead.style = gridStyle;
@@ -221,11 +226,14 @@ function randomGridPosition() {
 
 //funksjon som spawner et eple, og gir den en random grid posisjon.
 function spawnApple() {
-  let apple = makeElement("div", { class: "apple" });
   let appleX = randomGridPosition();
   let appleY = randomGridPosition();
+  let appleGridCoordinates = `grid-column: ${appleX}/span 1; grid-row: ${appleY}/span 1`;
+  if (gameElements.gridCoordinates.includes(appleGridCoordinates))
+    return spawnApple;
+  let apple = makeElement("div", { className: "apple" });
   gameElements.appleElements.apple = { element: apple, x: appleX, y: appleY };
-  apple.style = `grid-column: ${appleX}/span 1; grid-row: ${appleY}/span 1`;
+  apple.style = appleGridCoordinates;
   gameScreen.appendChild(apple);
 }
 
@@ -297,10 +305,10 @@ function setHighScore() {
 //funksjon som lager knappen som starter spillet på gamestart eller hvis spillet resetes.
 function showBtn() {
   let startBtn = makeElement("button", {
-    class: "btn",
+    className: "btn",
+    textContent: "Start Game!",
   });
   gameElements.startBtn = startBtn;
-  startBtn.textContent = "Start Game!";
   if (gameReset === true) startBtn.textContent = "Reset Game!";
   gameScreen.appendChild(startBtn);
   startBtn.addEventListener("click", () => {
@@ -342,46 +350,20 @@ function mobileSetup() {
 //denne blir mye bedre når eg endrer makeElements.
 function makeMobileButtons() {
   const mobileControlContainer = makeElement("div", {
-    class: "mobileControlContainer",
+    className: "mobileControlContainer",
   });
-  const mobileLeftButton = makeElement("button", { class: "mobileLeftButton" });
-  mobileLeftButton.textContent = "LEFT!";
-  gameElements.mobileLeftButton = mobileLeftButton;
-  const mobileRightButton = makeElement("button", {
-    class: "mobileRightButton",
+  Object.keys(inputObject).forEach((input) => {
+    const inputButton = makeElement("button", {
+      className: input,
+      textContent: inputObject[input],
+    });
+    mobileControlContainer.appendChild(inputButton);
+    inputButton.addEventListener("click", () => {
+      if (!gameActive || !mobileMode) return;
+      gameControl(input);
+    });
   });
-  mobileRightButton.textContent = "RIGHT!";
-  gameElements.mobileRightButton = mobileRightButton;
-  const mobileUpButton = makeElement("button", { class: "mobileUpButton" });
-  mobileUpButton.textContent = "UP!";
-  gameElements.mobileUpButton = mobileUpButton;
-  const mobileDownButton = makeElement("button", { class: "mobileDownButton" });
-  mobileDownButton.textContent = "DOWN!";
-  gameElements.mobileDownButton = mobileDownButton;
   document.body.appendChild(mobileControlContainer);
-  mobileControlContainer.appendChild(mobileLeftButton);
-  mobileControlContainer.appendChild(mobileRightButton);
-  mobileControlContainer.appendChild(mobileUpButton);
-  mobileControlContainer.appendChild(mobileDownButton);
-  addMobileEventListeners();
-}
-function addMobileEventListeners() {
-  gameElements.mobileDownButton.addEventListener("click", () => {
-    if (!gameActive || !mobileMode) return;
-    gameControl("s");
-  });
-  gameElements.mobileUpButton.addEventListener("click", () => {
-    if (!gameActive || !mobileMode) return;
-    gameControl("w");
-  });
-  gameElements.mobileRightButton.addEventListener("click", () => {
-    if (!gameActive || !mobileMode) return;
-    gameControl("d");
-  });
-  gameElements.mobileLeftButton.addEventListener("click", () => {
-    if (!gameActive || !mobileMode) return;
-    gameControl("a");
-  });
 }
 document.addEventListener("keydown", (event) => {
   if (!gameActive || mobileMode) return;
