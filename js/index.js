@@ -31,9 +31,10 @@ let gridSize = 0;
 let mobileGridSize = 0;
 
 //finner css rules for gameScreen
+//bruker array from i tilfelle jeg plutselig ødelegger CSS stylesheet
 let gameScreenStyleArray = Array.from(document.styleSheets[0].cssRules);
 //bruker parseInt + regex /\D/g for å fjerne alle bokstaver fra css rule etter repeat for å finne gridsize
-/* Det var ganske tricky å gjøre denne agnostic for hvor tallene stod i CSS sheet.
+/* Det var ganske tricky å gjøre denne agnostic for hvor css classen stod i CSS sheet.
 Men nå kan nye ting bli adda i CSS uten å være redd for rekkefølgen. className må ikke endres på, da må det endres her. */
 gameScreenStyleArray.forEach((style) => {
   if (style.selectorText === ".gameScreen")
