@@ -164,7 +164,7 @@ function resetGameScreen() {
   currentPositionX = 1;
   currentPositionY = 1;
   setHighScore();
-  let score = 0;
+  score = 0;
   scoreCount.textContent = `score: ${score}`;
   updateGridCoordinates();
 }
@@ -260,8 +260,10 @@ function spawnApple() {
   let appleX = randomGridPosition();
   let appleY = randomGridPosition();
   let appleGridCoordinates = `grid-column: ${appleX}/span 1; grid-row: ${appleY}/span 1`;
-  if (gameElements.gridCoordinates.includes(appleGridCoordinates))
-    return spawnApple;
+  if (gameElements.gridCoordinates.includes(appleGridCoordinates)) {
+    spawnApple();
+    return;
+  }
   let apple = makeElement("div", { className: "apple" });
   gameElements.appleElements.apple = { element: apple, x: appleX, y: appleY };
   apple.style = appleGridCoordinates;
