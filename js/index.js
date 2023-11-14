@@ -398,3 +398,5 @@ document.addEventListener("keydown", (event) => {
   gameControl(event.key.toLowerCase());
   console.log(event.key.toLowerCase());
 });
+
+/* !!UPDATE GITHUB PAGES PLS!! */
