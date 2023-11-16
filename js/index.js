@@ -237,13 +237,13 @@ function moveUp() {
 //funksjon som clearer alle intervals, sånn at de kan resettes.
 function clearIntervals() {
   clearInterval(moveUpInterval);
-  moveUpInterval = null;
+  moveUpInterval = 0;
   clearInterval(moveDownInterval);
-  moveDownInterval = null;
+  moveDownInterval = 0;
   clearInterval(moveLeftInterval);
-  moveLeftInterval = null;
+  moveLeftInterval = 0;
   clearInterval(moveRightInterval);
-  moveRightInterval = null;
+  moveRightInterval = 0;
   moved = false;
 }
 
@@ -393,7 +393,6 @@ function makeMobileButtons() {
 document.addEventListener("keydown", (event) => {
   if (!gameActive || mobileMode || !moved) return;
   gameControl(event.key.toLowerCase());
-  console.log(event.key.toLowerCase());
 });
 
 /* !!UPDATE GITHUB PAGES PLS!! */
