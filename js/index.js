@@ -178,7 +178,6 @@ function moveRight() {
     currentPositionY < gridSize &&
     currentPositionY >= 1
   ) {
-    currentPositionY++;
     currentPositionX = 1;
   } else if (currentPositionX > gridSize && currentPositionY === gridSize) {
     currentPositionX = 1;
@@ -195,7 +194,6 @@ function moveLeft() {
     currentPositionY <= gridSize &&
     currentPositionY > 1
   ) {
-    currentPositionY--;
     currentPositionX = gridSize;
   } else if (currentPositionX <= 1 && currentPositionY === 1) {
     currentPositionX = gridSize;
@@ -212,7 +210,6 @@ function moveDown() {
     currentPositionX < gridSize &&
     currentPositionX >= 1
   ) {
-    currentPositionX++;
     currentPositionY = 1;
   } else if (currentPositionY > gridSize && currentPositionX === gridSize) {
     currentPositionX = 1;
@@ -229,7 +226,6 @@ function moveUp() {
     currentPositionX <= gridSize &&
     currentPositionX > 1
   ) {
-    currentPositionX--;
     currentPositionY = gridSize;
   } else if (currentPositionY <= 1 && currentPositionX === 1) {
     currentPositionX = gridSize;
