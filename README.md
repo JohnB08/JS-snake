@@ -4,5 +4,6 @@ CSS GRID SNAKE
 
 Using display: grid; to define the playspace for a simple game of Snake.
 
-![image](https://github.com/JohnB08/JS-snake/assets/142892183/b9e0c16b-cba2-489f-83ee-95a059f4df15)
+![bilde](https://github.com/JohnB08/JS-snake/assets/142892183/3e4c8024-066d-4557-9cb1-3e4961d76c90)
+
 
