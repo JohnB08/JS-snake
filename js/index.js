@@ -66,11 +66,11 @@ gameScreenStyleArray.forEach((style) => {
 });
 console.log(mobileGridSize);
 let gameReset = false;
-let moveHorizontal = false;
-let moveVertical = false;
+let currentMovement = 0;
 let currentInterval = null;
 let currentPositionX = 1;
 let currentPositionY = 1;
+let activeClass = "rotateRight";
 let score = 0;
 let gameActive = false;
 let mobileMode = false;
@@ -152,6 +152,7 @@ function GameOver() {
   });
 }
 
+//funksjon som lager et promise to resolve etter en gitt duration
 function setTimeOutPromise(duration) {
   const myPromise = new Promise((resolve) => setTimeout(resolve, duration));
   return myPromise;
@@ -160,18 +161,18 @@ function setTimeOutPromise(duration) {
 //plaserer "snakeHead" tilbake til start i toppen. fjerner alle haler.
 //skjekker highscore, resetter score.
 async function resetGameScreen() {
+  //for at denne skal loope rett, må den loope baklengs gjennom arrayet. siden det er en async bruker en normal for loop.
   let tailArray = gameElements.tailElements;
   for (let i = tailArray.length - 1; i >= 0; i--) {
     await setTimeOutPromise(100);
     tailArray[i].apple.element.remove();
     tailArray.pop();
   }
-  snakeHead.classList.remove("rotateUp", "rotateDown", "rotateLeft");
+  setActiveClass();
   currentPositionX = 1;
   currentPositionY = 1;
   setHighScore();
-  moveHorizontal = false;
-  moveVertical = false;
+  setCurrentMovement();
   score = 0;
   scoreCount.textContent = `score: ${score}`;
   updateGridCoordinates();
@@ -182,13 +183,10 @@ function moveRight() {
   currentPositionX++;
   if (
     currentPositionX > gridSize &&
-    currentPositionY < gridSize &&
+    currentPositionY <= gridSize &&
     currentPositionY >= 1
   ) {
     currentPositionX = 1;
-  } else if (currentPositionX > gridSize && currentPositionY === gridSize) {
-    currentPositionX = 1;
-    currentPositionY = 1;
   }
   updateGridCoordinates();
 }
@@ -196,15 +194,8 @@ function moveRight() {
 //Funksjon som øker / flytter på grid posisjon mot venstre.
 function moveLeft() {
   currentPositionX--;
-  if (
-    currentPositionX < 1 &&
-    currentPositionY <= gridSize &&
-    currentPositionY > 1
-  ) {
+  if (currentPositionX < 1 && currentPositionY <= gridSize) {
     currentPositionX = gridSize;
-  } else if (currentPositionX <= 1 && currentPositionY === 1) {
-    currentPositionX = gridSize;
-    currentPositionY = gridSize;
   }
   updateGridCoordinates();
 }
@@ -214,12 +205,9 @@ function moveDown() {
   currentPositionY++;
   if (
     currentPositionY > gridSize &&
-    currentPositionX < gridSize &&
+    currentPositionX <= gridSize &&
     currentPositionX >= 1
   ) {
-    currentPositionY = 1;
-  } else if (currentPositionY > gridSize && currentPositionX === gridSize) {
-    currentPositionX = 1;
     currentPositionY = 1;
   }
   updateGridCoordinates();
@@ -231,11 +219,8 @@ function moveUp() {
   if (
     currentPositionY < 1 &&
     currentPositionX <= gridSize &&
-    currentPositionX > 1
+    currentPositionX >= 1
   ) {
-    currentPositionY = gridSize;
-  } else if (currentPositionY <= 1 && currentPositionX === 1) {
-    currentPositionX = gridSize;
     currentPositionY = gridSize;
   }
   updateGridCoordinates();
@@ -245,6 +230,7 @@ function moveUp() {
 function clearIntervals(currentInterval) {
   clearInterval(currentInterval);
   currentInterval = 0;
+  //denne passer på at du ikke kan skifte retning før du har bevegd deg MINST en rute.
   moved = false;
 }
 
@@ -271,37 +257,42 @@ function spawnApple() {
 //funksjon som handler controls. skjekker hvilke taster som er trykket.
 function gameControl(event) {
   if (event === "arrowright" || event === "d") {
-    if (moveHorizontal) return;
-    snakeHead.classList.remove("rotateUp", "rotateDown");
-    moveHorizontal = true;
-    moveVertical = false;
+    if (currentMovement === "horizontal") return;
+    setActiveClass();
+    setCurrentMovement("horizontal");
     clearIntervals(currentInterval);
     currentInterval = setInterval(moveRight, 100);
   } else if (event === "arrowleft" || event === "a") {
-    if (moveHorizontal) return;
-    snakeHead.classList.remove("rotateUp", "rotateDown");
-    snakeHead.classList.add("rotateLeft");
-    moveHorizontal = true;
-    moveVertical = false;
+    if (currentMovement === "horizontal") return;
+    setActiveClass("rotateLeft");
+    setCurrentMovement("horizontal");
     clearIntervals(currentInterval);
     currentInterval = setInterval(moveLeft, 100);
   } else if (event === "arrowdown" || event === "s") {
-    if (moveVertical) return;
-    snakeHead.classList.remove("rotateLeft", "rotateRight");
-    snakeHead.classList.add("rotateDown");
+    if (currentMovement === "vertical") return;
+    setActiveClass("rotateDown");
+    setCurrentMovement("vertical");
     clearIntervals(currentInterval);
-    moveHorizontal = false;
-    moveVertical = true;
     currentInterval = setInterval(moveDown, 100);
   } else if (event === "arrowup" || event === "w") {
-    if (moveVertical) return;
-    snakeHead.classList.remove("rotateLeft", "rotateRight");
-    snakeHead.classList.add("rotateUp");
+    if (currentMovement === "vertical") return;
+    setActiveClass("rotateUp");
+    setCurrentMovement("vertical");
     clearIntervals(currentInterval);
-    moveHorizontal = false;
-    moveVertical = true;
     currentInterval = setInterval(moveUp, 100);
   }
+}
+
+//funksjon som setter retning
+function setCurrentMovement(direction = 0) {
+  currentMovement = direction;
+}
+
+//funksjon som setter hvilken class som er aktiv.
+function setActiveClass(className = "rotateRight") {
+  snakeHead.classList.remove(activeClass);
+  activeClass = className;
+  snakeHead.classList.add(activeClass);
 }
 
 //funksjon som skjekker om et "eple" er spist.
@@ -404,11 +395,11 @@ document.addEventListener("keydown", (event) => {
   gameControl(event.key.toLowerCase());
 });
 
+//funksjon som pause hvis bruker alt-tabber ut av vinduet.
 window.addEventListener("blur", () => {
   clearIntervals(currentInterval);
+  setCurrentMovement();
   moved = true;
 });
 
 /* !!UPDATE GITHUB PAGES PLS!! */
-
-console.log(window);
