@@ -150,16 +150,22 @@ function GameOver() {
     gameReset = true;
     gameActive = false;
     resetGameScreen();
-    showBtn();
   });
 }
 
+function setTimeOutPromise(duration) {
+  const myPromise = new Promise((resolve) => setTimeout(resolve, duration));
+  return myPromise;
+}
 //funksjon som resetter gameScreen.
 //plaserer "snakeHead" tilbake til start i toppen. fjerner alle haler.
 //skjekker highscore, resetter score.
-function resetGameScreen() {
-  let tailArray = document.querySelectorAll(".snakeTail");
-  tailArray.forEach((tail) => tail.remove());
+async function resetGameScreen() {
+  let tailArray = gameElements.tailElements.reverse();
+  for (let tail of tailArray) {
+    await setTimeOutPromise(250);
+    tail.apple.element.remove();
+  }
   gameElements.tailElements = [];
   snakeHead.classList.remove("rotateUp", "rotateDown", "rotateLeft");
   currentPositionX = 1;
@@ -168,8 +174,8 @@ function resetGameScreen() {
   score = 0;
   scoreCount.textContent = `score: ${score}`;
   updateGridCoordinates();
+  showBtn();
 }
-
 //Funksjon som øker / flytter på grid posisjon mot høyre.
 function moveRight() {
   currentPositionX++;
