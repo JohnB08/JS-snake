@@ -11,7 +11,6 @@ snakeHead.appendChild(snakeEye);
 scoreContainer.appendChild(scoreCount);
 scoreContainer.appendChild(highScoreCount);
 gameScreen.appendChild(snakeHead);
-console.log(document);
 const gameElements = {
   tailElements: [],
   appleElements: {},
@@ -30,6 +29,7 @@ const inputObject = {
 let gridSize = 0;
 let mobileGridSize = 0;
 
+//gimmicken her var å prøve å lese stylesheetet direkte å finne størrelsen der.
 //finner css rules for gameScreen
 //bruker array from i tilfelle jeg plutselig ødelegger CSS stylesheet
 let gameScreenStyleArray = Array.from(document.styleSheets[0].cssRules);
@@ -64,7 +64,6 @@ gameScreenStyleArray.forEach((style) => {
     });
   }
 });
-console.log(mobileGridSize);
 let gameReset = false;
 let currentMovement = 0;
 let currentInterval = null;
@@ -78,8 +77,13 @@ scoreCount.textContent = `score: ${score}`;
 let highScore = JSON.parse(localStorage.getItem("highScoreSnake")) || 0;
 highScoreCount.textContent = `high score: ${highScore}`;
 let moved = true;
+
+//skjekker om vi er på mobilskjerm
 mobileSetup();
+
+//viser knapp
 showBtn();
+
 //spawner et eple i starten av spillet.
 spawnApple();
 
@@ -169,14 +173,18 @@ async function resetGameScreen() {
     tailArray.pop();
   }
   setActiveClass();
-  currentPositionX = 1;
-  currentPositionY = 1;
+  resetValues();
   setHighScore();
   setCurrentMovement();
-  score = 0;
   scoreCount.textContent = `score: ${score}`;
   updateGridCoordinates();
   showBtn();
+}
+
+function resetValues() {
+  currentPositionX = 1;
+  currentPositionY = 1;
+  score = 0;
 }
 //Funksjon som øker / flytter på grid posisjon mot høyre.
 function moveRight() {
