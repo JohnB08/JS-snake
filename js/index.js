@@ -66,10 +66,9 @@ gameScreenStyleArray.forEach((style) => {
 });
 console.log(mobileGridSize);
 let gameReset = false;
-let moveUpInterval = null;
-let moveDownInterval = null;
-let moveLeftInterval = null;
-let moveRightInterval = null;
+let moveHorizontal = false;
+let moveVertical = false;
+let currentInterval = null;
 let currentPositionX = 1;
 let currentPositionY = 1;
 let score = 0;
@@ -146,7 +145,7 @@ function GameOver() {
   tailArray.forEach((tail) => {
     if (tail.apple.appleX !== currentPositionX) return;
     else if (tail.apple.appleY !== currentPositionY) return;
-    clearIntervals();
+    clearIntervals(currentInterval);
     gameReset = true;
     gameActive = false;
     resetGameScreen();
@@ -163,7 +162,7 @@ function setTimeOutPromise(duration) {
 async function resetGameScreen() {
   let tailArray = gameElements.tailElements.reverse();
   for (let tail of tailArray) {
-    await setTimeOutPromise(250);
+    await setTimeOutPromise(100);
     tail.apple.element.remove();
   }
   gameElements.tailElements = [];
@@ -171,6 +170,8 @@ async function resetGameScreen() {
   currentPositionX = 1;
   currentPositionY = 1;
   setHighScore();
+  moveHorizontal = false;
+  moveVertical = false;
   score = 0;
   scoreCount.textContent = `score: ${score}`;
   updateGridCoordinates();
@@ -241,15 +242,9 @@ function moveUp() {
 }
 
 //funksjon som clearer alle intervals, sånn at de kan resettes.
-function clearIntervals() {
-  clearInterval(moveUpInterval);
-  moveUpInterval = 0;
-  clearInterval(moveDownInterval);
-  moveDownInterval = 0;
-  clearInterval(moveLeftInterval);
-  moveLeftInterval = 0;
-  clearInterval(moveRightInterval);
-  moveRightInterval = 0;
+function clearIntervals(currentInterval) {
+  clearInterval(currentInterval);
+  currentInterval = 0;
   moved = false;
 }
 
@@ -276,28 +271,32 @@ function spawnApple() {
 //funksjon som handler controls. skjekker hvilke taster som er trykket.
 function gameControl(event) {
   if (event === "arrowright" || event === "d") {
-    if (moveLeftInterval || moveRightInterval) return;
+    if (moveHorizontal) return;
     snakeHead.classList.remove("rotateUp", "rotateDown");
-    clearIntervals();
-    moveRightInterval = setInterval(moveRight, 100);
+    moveHorizontal = true;
+    clearIntervals(currentInterval);
+    currentInterval = setInterval(moveRight, 100);
   } else if (event === "arrowleft" || event === "a") {
-    if (moveLeftInterval || moveRightInterval) return;
+    if (moveHorizontal) return;
     snakeHead.classList.remove("rotateUp", "rotateDown");
     snakeHead.classList.add("rotateLeft");
-    clearIntervals();
-    moveLeftInterval = setInterval(moveLeft, 100);
+    moveHorizontal = true;
+    clearIntervals(currentInterval);
+    currentInterval = setInterval(moveLeft, 100);
   } else if (event === "arrowdown" || event === "s") {
-    if (moveUpInterval || moveDownInterval) return;
+    if (!moveHorizontal) return;
     snakeHead.classList.remove("rotateLeft", "rotateRight");
     snakeHead.classList.add("rotateDown");
-    clearIntervals();
-    moveDownInterval = setInterval(moveDown, 100);
+    clearIntervals(currentInterval);
+    moveHorizontal = false;
+    currentInterval = setInterval(moveDown, 100);
   } else if (event === "arrowup" || event === "w") {
-    if (moveUpInterval || moveDownInterval) return;
+    if (!moveHorizontal) return;
     snakeHead.classList.remove("rotateLeft", "rotateRight");
     snakeHead.classList.add("rotateUp");
-    clearIntervals();
-    moveUpInterval = setInterval(moveUp, 100);
+    clearIntervals(currentInterval);
+    moveHorizontal = false;
+    currentInterval = setInterval(moveUp, 100);
   }
 }
 
@@ -401,4 +400,11 @@ document.addEventListener("keydown", (event) => {
   gameControl(event.key.toLowerCase());
 });
 
+window.addEventListener("blur", () => {
+  clearIntervals(currentInterval);
+  moved = true;
+});
+
 /* !!UPDATE GITHUB PAGES PLS!! */
+
+console.log(window);
