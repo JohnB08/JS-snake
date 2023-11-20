@@ -160,12 +160,12 @@ function setTimeOutPromise(duration) {
 //plaserer "snakeHead" tilbake til start i toppen. fjerner alle haler.
 //skjekker highscore, resetter score.
 async function resetGameScreen() {
-  let tailArray = gameElements.tailElements.reverse();
-  for (let tail of tailArray) {
+  let tailArray = gameElements.tailElements;
+  for (let i = tailArray.length - 1; i >= 0; i--) {
     await setTimeOutPromise(100);
-    tail.apple.element.remove();
+    tailArray[i].apple.element.remove();
+    tailArray.pop();
   }
-  gameElements.tailElements = [];
   snakeHead.classList.remove("rotateUp", "rotateDown", "rotateLeft");
   currentPositionX = 1;
   currentPositionY = 1;
@@ -274,6 +274,7 @@ function gameControl(event) {
     if (moveHorizontal) return;
     snakeHead.classList.remove("rotateUp", "rotateDown");
     moveHorizontal = true;
+    moveVertical = false;
     clearIntervals(currentInterval);
     currentInterval = setInterval(moveRight, 100);
   } else if (event === "arrowleft" || event === "a") {
@@ -281,21 +282,24 @@ function gameControl(event) {
     snakeHead.classList.remove("rotateUp", "rotateDown");
     snakeHead.classList.add("rotateLeft");
     moveHorizontal = true;
+    moveVertical = false;
     clearIntervals(currentInterval);
     currentInterval = setInterval(moveLeft, 100);
   } else if (event === "arrowdown" || event === "s") {
-    if (!moveHorizontal) return;
+    if (moveVertical) return;
     snakeHead.classList.remove("rotateLeft", "rotateRight");
     snakeHead.classList.add("rotateDown");
     clearIntervals(currentInterval);
     moveHorizontal = false;
+    moveVertical = true;
     currentInterval = setInterval(moveDown, 100);
   } else if (event === "arrowup" || event === "w") {
-    if (!moveHorizontal) return;
+    if (moveVertical) return;
     snakeHead.classList.remove("rotateLeft", "rotateRight");
     snakeHead.classList.add("rotateUp");
     clearIntervals(currentInterval);
     moveHorizontal = false;
+    moveVertical = true;
     currentInterval = setInterval(moveUp, 100);
   }
 }
