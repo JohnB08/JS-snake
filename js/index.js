@@ -117,7 +117,7 @@ function updateGridCoordinates() {
   moved = true;
 }
 
-//funksjonen som opptarerer tail coordinates. Skjekker også om "snakeHead" er borti "snakeTail"
+//funksjonen som opptarerer tail coordinates. Skjekker også om "snakeHead" er borti "snakeTail" via gameOver.
 function updateTailCoordinates() {
   if (gameElements.tailElements.length === 0) return;
   else saveTailCoordinates();
@@ -174,18 +174,16 @@ async function resetGameScreen() {
     tailArray.pop();
   }
   setActiveClass();
-  resetValues();
+  resetStartPosition();
   setHighScore();
   setCurrentMovement();
-  scoreCount.textContent = `score: ${score}`;
   updateGridCoordinates();
   showBtn();
 }
 
-function resetValues() {
+function resetStartPosition() {
   currentPositionX = 1;
   currentPositionY = 1;
-  score = 0;
 }
 //Funksjon som øker / flytter på grid posisjon mot høyre.
 function moveRight() {
@@ -292,12 +290,12 @@ function gameControl(event) {
   }
 }
 
-//funksjon som setter retning
+//funksjon som setter aktiv bevegelses retning, default 0.
 function setCurrentMovement(direction = 0) {
   currentMovement = direction;
 }
 
-//funksjon som setter hvilken class som er aktiv.
+//funksjon som setter hvilken snakeHeadClass som er aktiv, default rotateRight
 function setActiveClass(className = "rotateRight") {
   snakeHead.classList.remove(activeClass);
   activeClass = className;
@@ -339,6 +337,8 @@ function setHighScore() {
     highScore = score;
     highScoreCount.textContent = `high score: ${highScore}`;
   }
+  score = 0;
+  scoreCount.textContent = `score: ${score}`;
 }
 
 //funksjon som lager knappen som starter spillet på gamestart eller hvis spillet resetes.
