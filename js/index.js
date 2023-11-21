@@ -87,7 +87,12 @@ showBtn();
 //spawner et eple i starten av spillet.
 spawnApple();
 
-//funksjon som lager HTML elementer.
+/**
+ * Funksjon som lager HTML elementer
+ * @param {*} type hvilke type html element
+ * @param {*} properties object med key/value pairs. key = attributename, value = attributevalue
+ * @returns htmlElement.
+ */
 function makeElement(type, properties) {
   const element = document.createElement(type);
   //tar alle keys og values og gjør de om til key/value arrays.
@@ -101,8 +106,10 @@ function makeElement(type, properties) {
   return element;
 }
 
-//Funksjon som oppdaterer grid koordinatene til "snake" og "tail" etterhvert som den flytter seg.
-//skjekker også om det er et eple på current coordinates.
+/**
+ * Funksjon som oppdaterer grid koordinatene til "snake" og "tail" etterhvert som den flytter seg.
+ * Skjekker også om det er et eple på current coordinates.
+ */
 function updateGridCoordinates() {
   eatApple();
   let gridStyle = `grid-column: ${currentPositionX}/span 1; grid-row: ${currentPositionY}/span 1`;
@@ -117,14 +124,19 @@ function updateGridCoordinates() {
   moved = true;
 }
 
-//funksjonen som opptarerer tail coordinates. Skjekker også om "snakeHead" er borti "snakeTail" via gameOver.
+/**
+ * Funksjonen som opptarerer tail coordinates. Skjekker også om "snakeHead" er borti "snakeTail" via gameOver.
+ * @returns om tails ikke finnes.
+ */
 function updateTailCoordinates() {
   if (gameElements.tailElements.length === 0) return;
   else saveTailCoordinates();
   GameOver();
 }
 
-//funksjon som lagrer X og Y koordinatene til hver "tail" i grid.
+/**
+ * Funksjon som lagrer X og Y koordinatene til hver "tail" i grid.
+ */
 function saveTailCoordinates() {
   let coordinatesArray = gameElements.gridCoordinates;
   let tailArray = gameElements.tailElements;
@@ -142,8 +154,10 @@ function saveTailCoordinates() {
   }
 }
 
-//funksjon som skjekker om "snakeHead" og "snakeTail" har samme posisjon i grid.
-//hvis det stemmer, reset spillet.
+/**
+ * funksjon som skjekker om "snakeHead" og "snakeTail" har samme posisjon i grid.
+ * Hvis det stemmer, reset spillet.
+ */
 function GameOver() {
   let tailArray = gameElements.tailElements;
   tailArray.forEach((tail) => {
@@ -156,14 +170,21 @@ function GameOver() {
   });
 }
 
-//funksjon som lager et promise to resolve etter en gitt duration
+/**
+ * funksjon som lager et promise to resolve etter en gitt duration
+ * @param {*} duration antal millisekund før den resolver promise
+ * @returns promised resolve.
+ */
 function setTimeOutPromise(duration) {
   const myPromise = new Promise((resolve) => setTimeout(resolve, duration));
   return myPromise;
 }
-//funksjon som resetter gameScreen.
-//plaserer "snakeHead" tilbake til start i toppen. fjerner alle haler.
-//skjekker highscore, resetter score.
+
+/**
+ *funksjon som resetter gameScreen.
+ Plaserer "snakeHead" tilbake til start i toppen. fjerner alle haler.
+ Skjekker highscore, resetter score.
+ */
 async function resetGameScreen() {
   //for at denne skal loope rett, må den loope baklengs gjennom arrayet. siden det er en async bruker en normal for loop.
   let tailArray = gameElements.tailElements;
@@ -181,11 +202,17 @@ async function resetGameScreen() {
   showBtn();
 }
 
+/**
+ * funksjon som setter snakeHead currentPositions til 1.
+ */
 function resetStartPosition() {
   currentPositionX = 1;
   currentPositionY = 1;
 }
-//Funksjon som øker / flytter på grid posisjon mot høyre.
+
+/**
+ * Funksjon som øker / flytter på grid posisjon mot høyre.
+ */
 function moveRight() {
   currentPositionX++;
   if (
@@ -198,7 +225,9 @@ function moveRight() {
   updateGridCoordinates();
 }
 
-//Funksjon som øker / flytter på grid posisjon mot venstre.
+/**
+ * Funksjon som øker / flytter på grid posisjon mot venstre.
+ */
 function moveLeft() {
   currentPositionX--;
   if (currentPositionX < 1 && currentPositionY <= gridSize) {
@@ -207,7 +236,9 @@ function moveLeft() {
   updateGridCoordinates();
 }
 
-//Funksjon som øker / flytter på grid posisjon nedover.
+/**
+ * Funksjon som øker / flytter på grid posisjon nedover.
+ */
 function moveDown() {
   currentPositionY++;
   if (
@@ -220,7 +251,9 @@ function moveDown() {
   updateGridCoordinates();
 }
 
-//Funksjon som øker / flytter på grid posisjon oppover.
+/**
+ * Funksjon som øker / flytter på grid posisjon oppover.
+ */
 function moveUp() {
   currentPositionY--;
   if (
@@ -233,7 +266,10 @@ function moveUp() {
   updateGridCoordinates();
 }
 
-//funksjon som clearer alle intervals, sånn at de kan resettes.
+/**
+ * funksjon som clearer alle intervals, sånn at de kan resettes.
+ * @param {*} currentInterval intervallet som kjøres nå.
+ */
 function clearIntervals(currentInterval) {
   clearInterval(currentInterval);
   currentInterval = 0;
@@ -241,12 +277,18 @@ function clearIntervals(currentInterval) {
   moved = false;
 }
 
-//funksjon som lager en random grid posisjon.
+/**
+ * funksjon som lager en random grid posisjon.
+ * @returns en tilfeldig posisjon i display: grid;
+ */
 function randomGridPosition() {
   return Math.ceil(Math.random() * gridSize);
 }
 
-//funksjon som spawner et eple, og gir den en random grid posisjon.
+/**
+ * funksjon som spawner et eple, og gir den en random grid posisjon.
+ * @returns om eplet blir spawna inni slangen, start på nytt.
+ */
 function spawnApple() {
   let appleX = randomGridPosition();
   let appleY = randomGridPosition();
@@ -261,7 +303,11 @@ function spawnApple() {
   gameScreen.appendChild(apple);
 }
 
-//funksjon som handler controls. skjekker hvilke taster som er trykket.
+/**
+ * funksjon som handler controls. skjekker hvilke taster som er trykket.
+ * @param {*} event eventen er det som er blitt trykket.
+ * @returns returner om noe annet en gyldige taster er trykket.
+ */
 function gameControl(event) {
   if (event === "arrowright" || event === "d") {
     if (currentMovement === "horizontal") return;
@@ -290,19 +336,27 @@ function gameControl(event) {
   }
 }
 
-//funksjon som setter aktiv bevegelses retning, default 0.
+/**
+ * funksjon som setter aktiv bevegelses retning, default 0.
+ * @param {*} direction retning snake beveger seg i, horizontal eller vertical.
+ */
 function setCurrentMovement(direction = 0) {
   currentMovement = direction;
 }
 
-//funksjon som setter hvilken snakeHeadClass som er aktiv, default rotateRight
+/**
+ * funksjon som setter hvilken snakeHeadClass som er aktiv, default rotateRight
+ * @param {*} className className som snakeHead får.
+ */
 function setActiveClass(className = "rotateRight") {
   snakeHead.classList.remove(activeClass);
   activeClass = className;
   snakeHead.classList.add(activeClass);
 }
 
-//funksjon som skjekker om et "eple" er spist.
+/**
+ * funksjon som skjekker om et "eple" er spist.
+ */
 function eatApple() {
   let appleArray = Object.keys(gameElements.appleElements);
   appleArray.forEach((apple) => {
@@ -321,6 +375,13 @@ function eatApple() {
 }
 
 //funksjon som konverterer eple til et haleelement hvis det er spist i eatApple()
+/**
+ * konverterer eple element til tail element. lagrer nye elementet i gameElements{}
+ * @param {*} apple html elementet
+ * @param {*} y y coordinate i grid
+ * @param {*} x x coordinate i grid
+ *
+ */
 function convertApple(apple, y, x) {
   apple.classList.remove("apple");
   apple.classList.add("snakeTail");
@@ -329,7 +390,10 @@ function convertApple(apple, y, x) {
   });
 }
 
-//skjekker om det er en ny highscore. poster highscore i localStorage.
+/**
+ * Skjekker om det er en ny highscore. poster highscore i localStorage.
+ * @returns hvis highscore ikke er funnet.
+ */
 function setHighScore() {
   if (score < highScore) return;
   else {
@@ -341,7 +405,9 @@ function setHighScore() {
   scoreCount.textContent = `score: ${score}`;
 }
 
-//funksjon som lager knappen som starter spillet på gamestart eller hvis spillet resetes.
+/**
+ * Funksjon som lager knappen som starter spillet på gamestart eller hvis spillet resetes.
+ */
 function showBtn() {
   let startBtn = makeElement("button", {
     className: "btn",
@@ -355,21 +421,28 @@ function showBtn() {
   });
 }
 
-//funksjon som fjerner knappen på gamestart, og lager eventlistener til gameControl.
+/**
+ * Funksjon som fjerner knappen på gamestart, og lager eventlistener til gameControl.
+ */
 function btnRemoval() {
   gameElements.startBtn.remove();
   gameElements.startBtn = null;
   gameActive = true;
 }
 
-//eventlistener for å starte spillet med "enter" knapp.
+/**
+ * Funksjon som fjerner knappen på gamestart, og lager eventlistener til gameControl.
+ */
 document.addEventListener("keydown", (event) => {
   if (!gameElements.startBtn) return;
   if (event.code !== "Enter") return;
   btnRemoval();
 });
 
-//funksjon som skjekker om vi er på mobil
+/**
+ * Funksjon som fjerner knappen på gamestart, og lager eventlistener til gameControl.
+ * @returns om skjermen ikke tilsier at vi er på tlf
+ */
 function mobileSetup() {
   if (window.innerWidth > 600) return;
   else {
@@ -379,7 +452,9 @@ function mobileSetup() {
     makeMobileButtons();
   }
 }
-//funksjon som lager knapper hvis vi er på tlf.
+/**
+ * Funksjon som fjerner knappen på gamestart, og lager eventlistener til gameControl.
+ */
 function makeMobileButtons() {
   const mobileControlContainer = makeElement("div", {
     className: "mobileControlContainer",
@@ -398,13 +473,17 @@ function makeMobileButtons() {
   document.body.appendChild(mobileControlContainer);
 }
 
-//main event listener.
+/**
+ * Main EventListener
+ */
 document.addEventListener("keydown", (event) => {
   if (!gameActive || mobileMode || !moved) return;
   gameControl(event.key.toLowerCase());
 });
 
-//funksjon som pause hvis bruker alt-tabber ut av vinduet.
+/**
+ * EventListener som pauser spillet om vi er alt-tabba.
+ */
 window.addEventListener("blur", () => {
   clearIntervals(currentInterval);
   setCurrentMovement();
