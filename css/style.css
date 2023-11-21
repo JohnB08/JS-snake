@@ -15,6 +15,7 @@ body {
   grid-template-columns: repeat(40, 12px);
   grid-template-rows: repeat(40, 12px);
   position: relative;
+  place-content: center;
 }
 
 .apple {
@@ -44,6 +45,14 @@ body {
 .snakeHead,
 .snakeTail {
   background-color: blue;
+}
+.snakeTailDeath {
+  animation: delete 200ms linear;
+}
+@keyframes delete {
+  100% {
+    transform: scale(0);
+  }
 }
 .snakeHead {
   position: relative;

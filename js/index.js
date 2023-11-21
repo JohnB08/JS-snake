@@ -168,7 +168,8 @@ async function resetGameScreen() {
   //for at denne skal loope rett, må den loope baklengs gjennom arrayet. siden det er en async bruker en normal for loop.
   let tailArray = gameElements.tailElements;
   for (let i = tailArray.length - 1; i >= 0; i--) {
-    await setTimeOutPromise(100);
+    tailArray[i].apple.element.classList.add("snakeTailDeath");
+    await setTimeOutPromise(200);
     tailArray[i].apple.element.remove();
     tailArray.pop();
   }
